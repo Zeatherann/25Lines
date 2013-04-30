@@ -1,7 +1,10 @@
 require 'fileutils'
 
 def count_semicolons file
-  File.read(file).count(";")  
+  text = File.read(file)
+  text.gsub! /\/\*.*\*\//m, ""
+  text.gsub! /\/\/.*/, ""
+  text.count ";"
 end
 
 def count_many_semicolons files
