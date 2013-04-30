@@ -14,7 +14,7 @@ changed_semicolons = count_many_semicolons(Dir["**/*.cpp"])
 tmp_path = "../_tmp_git_dir"
 Dir.mkdir(tmp_path)
 Dir.chdir(tmp_path) do
-  `git clone #{starting_directory} '.'`
+  `git clone "#{starting_directory}" .`
   original_semicolons = count_many_semicolons(Dir["**/*.cpp"])
   diff = changed_semicolons - original_semicolons
   if diff.abs <= 25
