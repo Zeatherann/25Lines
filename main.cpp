@@ -1,16 +1,4 @@
-#include <SFML/System.hpp>
-#include <SFML/Network.hpp>
-#include <iostream>
-#include <vector>
-#include <functional>
-#include <thread>
-
-using namespace std;
-
-const int PORT = 4567;
-
-enum HOST_OR_JOIN { HOST, JOIN };
-enum EXIT_CODES { UNABLE_TO_LISTEN=1 };
+#include "main.hpp"
 
 HOST_OR_JOIN HostOrJoin() {
     cout << "(h)ost or (j)oin: ";
@@ -60,7 +48,14 @@ int main()
             ClientConnection* client = new ClientConnection(Socket);
             std::function<void()> run = std::bind(&ClientConnection::Run, client);
             clients.push_back(client);
-            std::thread thread(run);
+            /* I would love to find a close replacement for std::thread (perhaps boost::thread?).
+                Though I don't know what special things you have to do to include boost::thread.
+                I am having odd compiler errors right now; these errors are killing the runtime executable when using libraries, would probably have to clean/reinstall compiler or something.
+
+                Also: Added the basics for my Tilemap class, this will draw nearly all of the geometry of any level in the game. I have added 23 semicolons.
+                Your semicolon counter is busted (lol) and only counts 12 of my added semicolons.
+            */
+            /*std::thread thread(run)*/;
         }
     } else if (choice == JOIN) {
         cout << "Joining! (Please implement.)\n";
