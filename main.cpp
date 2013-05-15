@@ -23,7 +23,7 @@ public:
     void Run() {
         cout << "Running a ClientConnection.\n";
         while (true) {
-            
+
         }
     }
 };
@@ -36,18 +36,18 @@ public:
     const Entity::Types Type;
     pairf Loc;
     sf::Texture& Texture;
-    
+
     Entity(Entity::Types type, pairf loc, string texture) : Type(type), Loc(loc), Texture(Textures.New(texture)) {
         Entities.insert(this);
     }
-    
+
     virtual ~Entity() {
         Entities.erase(this);
     }
-    
+
     virtual void Update()=0;
-    
-    virtual void Render() {}
+
+    virtual void Render()const{}
 };
 
 set<Entity*> Entity::Entities;
@@ -57,19 +57,59 @@ class Item : public Entity {
 public:
     enum Types {FOOD, GOLD, KEY};
     const Item::Types Type;
-    
+
     Item(Item::Types type, pairf loc={0,0}, string texture="default.png") : Entity(ITEM, loc, texture), Type(type) {
-        
+
     }
-    
+
     virtual void Update() {
         cout << "I'm an Item, bro!\n";
     }
 };
 
+class Level{
+public:
+    Tilemap Ground;
+    Tilemap Walls;
+    Tilemap Special;
+    set<Entity*> Objects;
+    //lua_State* MyState;
+    Level(const string& LevelName):Ground(),Walls(),Special(),Objects()/*,myState(NULL)*/{
+        //MyState=luaL_newstate();
+        /// Load Level from file. LevelName_ground.png LevelName_walls.png LevelName_special.png LevelName_objects.yml LevelName_script.lua
+    }
+    ~Level(){
+        for(Entity* Iter:Objects){
+            delete Iter;
+        }
+        //luaL_closestate(MyState);
+    }
+    void Render(int X,int Y,int Rows,int Columns)const{
+        Ground.Render(X,Y,Rows,Columns);
+        Walls.Render(X,Y,Rows,Columns);
+        for(Entity* Iter:Objects){
+            sf::FloatRect Viewf(X,Y,X+Rows,Y+Columns);
+            if(Viewf.contains(Iter->Loc.first,Iter->Loc.second))Iter->Render();
+        }
+        Special.Render(X,Y,Rows,Columns);
+    }
+    void Update(){
+        /// Call script.update
+        for(Entity* Iter:Objects){
+            Iter->Update();
+        }
+    }
+};
+
+class LevelBoss:public Level{};
+class LevelTower:public Level{};
+class LevelRealm:public Level{};
+class LevelWorld:public Level{};
+
 int main() {
     Entity* e = new Item(Item::FOOD);
     e->Update();
+    shared_ptr<sf::Thread> MyThread;
     HOST_OR_JOIN choice = HostOrJoin();
     if (choice == HOST) {
         vector<ClientConnection*> clients;
@@ -86,10 +126,8 @@ int main() {
                 cout << "Error: Something went wrong while trying to accept a client connection!\n";
             }
             ClientConnection* client = new ClientConnection(Socket);
-            std::function<void()> run = std::bind(&ClientConnection::Run, client);
             clients.push_back(client);
-            boost::thread thread(run);
-            thread.detach();
+            MyThread=shared_ptr<sf::Thread>(new sf::Thread(&ClientConnection::Run,client));
         }
     } else if (choice == JOIN) {
         cout << "Joining!\n";
@@ -101,5 +139,24 @@ int main() {
             exit(UNABLE_TO_CONNECT);
         }
     }
+    if(MyThread)MyThread->launch();
+    Window.create({800,640},"25 Lines",sf::Style::Close);
+    sf::Event Events;
+    while(Window.isOpen()){
+        Window.clear({64,64,64});
+        while(Window.pollEvent(Events)){
+            switch(Events.type){
+                case sf::Event::Closed:{
+                    Window.close();
+                    break;
+                }default:;
+            }
+        }// END EVENTS
+
+        /// Add Updating/Drawing/Ect
+        Window.display();
+    }
     return 0;
 }
+
+sf::RenderWindow Window;

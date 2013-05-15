@@ -1,7 +1,8 @@
 #ifndef MAIN_HPP
 #define MAIN_HPP
 /// Defines
-
+#define SFML_STATIC
+#define BOOST_THREAD_USE_LIB
 /// Libraries
 #include <SFML/System.hpp>
 #include <SFML/Network.hpp>
@@ -25,6 +26,7 @@ typedef std::pair<int, int> pairi;
 typedef std::pair<float, float> pairf;
 /// Global Variables
 const int PORT = 4567;
+extern sf::RenderWindow Window;
 /// Global Functions
 int main();
 // -----
