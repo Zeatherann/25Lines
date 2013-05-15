@@ -12,7 +12,7 @@ def count_many_semicolons files
 end
 
 def get_files
-  Dir["**/*.cpp"] + Dir["**/*.hpp"] + Dir["**/*.inl"]
+  Dir["**/*.cpp"] + Dir["**/*.hpp"] + Dir["**/*.inl"] - ARGV
 end
 
 starting_directory = Dir.pwd
