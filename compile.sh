@@ -1,0 +1,1 @@
+clang++ -framework SFML -framework sfml-system -framework sfml-network -framework sfml-graphics *.cpp -o 25Lines.bin -std=c++11 -stdlib=libc++ -I /usr/local/include/ -L /usr/local/lib -l boost_system-mt -l boost_thread-mt -Wall -Wextra -pedantic -Weverything -Wno-global-constructors
